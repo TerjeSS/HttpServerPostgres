@@ -12,11 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpServer {
+    private final ProductDao dao = new ProductDao();
     private Socket clientSocket;
     private final ServerSocket serversocket;
-    String fileTarget;
-    String requestLine;
-    String contentType;
     private Path root;
     String responseBody;
     List<String> categoriesList = new ArrayList<>();
@@ -63,8 +61,8 @@ public class HttpServer {
                 queryMap.put(queryParameter.substring(0,index), queryParameter.substring(index+1));
             }
             Product product = new Product(queryMap.get("productName"),queryMap.get("category"));
-            existingProducts.add(product);
-            responseBody = "Product added";
+            dao.addToDatabase(product);
+            responseBody = product.getName() +" added";
             write200Response(responseBody);
         }
         else if(requestTarget.equals("/api/categoryOptions")){
@@ -77,27 +75,20 @@ public class HttpServer {
 
         else if(requestTarget.equals("/api/products")){
             responseBody = "";
-
-            ProductDao dao = new ProductDao();
             List<Product> productList = dao.retrieveProducts();
+            if(productList.size() == 0){
+                responseBody = "The products database is currently empty. Please add products";
+                write200Response(responseBody);
+            }
             for (Product product : productList) {
                 responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
             }
             write200Response(responseBody);
-
-          if(existingProducts.size() == 0){
-
-            if(existingProducts.size() == 0){
-
-                responseBody = "The products database is currently empty. Please add products";
-                write200Response(responseBody);
-            }
         }
         else{
             write404Response(requestTarget);
         }
     }
-}
     private void write404Response(String fileTarget) throws IOException {
         String notFound = "The requested file: " + fileTarget + ", was not found";
         String response =
@@ -137,7 +128,7 @@ public class HttpServer {
         ProductDao productDao = new ProductDao();
         productDao.addToDatabase(product);*/
     }
-
+    //Only for testing
     private void setProducts(List<Product> products) {
         existingProducts = products;
     }
