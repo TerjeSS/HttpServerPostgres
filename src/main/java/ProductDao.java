@@ -1,8 +1,6 @@
 import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductDao {
     PGSimpleDataSource dataSource;
@@ -29,22 +27,6 @@ public class ProductDao {
             }
             }
         }
-    }
 
-    public List<Product> retrieveProducts() throws SQLException {
-        List<Product> productList = new ArrayList<>();
-        try(Connection connection = dataSource.getConnection()){
-            try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM products")){
-                ResultSet rs = statement.executeQuery();
-                while (rs.next()){
-                    productList.add(new Product(
-                            rs.getLong(1),
-                            rs.getString(2),
-                            rs.getString(3)));
-
-                }
-            }
-        }
-        return productList;
     }
 }
