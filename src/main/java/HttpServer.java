@@ -77,7 +77,22 @@ public class HttpServer {
 
         else if(requestTarget.equals("/api/products")){
             responseBody = "";
+
+            ProductDao dao = new ProductDao();
+            List<Product> productList = dao.retrieveProducts();
+            for (Product product : productList) {
+                responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
+            }
+            write200Response(responseBody);
+
+                        
+          
+          
+          
+          /*if(existingProducts.size() == 0){
+
             if(existingProducts.size() == 0){
+
                 responseBody = "The products database is currently empty. Please add products";
                 write200Response(responseBody);
                 }else {
