@@ -78,6 +78,7 @@ public class HttpServer {
                 responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
             }
             write200Response(responseBody);
+
                         /*if(existingProducts.size() == 0){
                 responseBody = "The products database is currently empty. Please add products";
                 write200Response(responseBody);

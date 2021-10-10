@@ -10,7 +10,6 @@ public class HttpMessage {
     int contentLength;
     String messageBody;
     String[] statusLine;
-
     public HttpMessage(Socket socket) throws IOException {
         this.socket = socket;
         statusLine = readLine(socket).split(" ");
