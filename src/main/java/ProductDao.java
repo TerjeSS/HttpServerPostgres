@@ -1,6 +1,8 @@
 import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDao {
     PGSimpleDataSource dataSource;
@@ -44,8 +46,5 @@ public class ProductDao {
             }
         }
         return productList;
-
-
-
     }
 }

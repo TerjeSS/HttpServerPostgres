@@ -1,12 +1,18 @@
 public class Product {
+    long id;
     String name;
     String category;
-    long id;
+
+    public Product(long id, String name, String category) {
+        this.name = name;
+        this.category = category;
+    }
 
     public Product(String name, String category) {
         this.name = name;
         this.category = category;
     }
+
     public String getName() {
         return name;
     }

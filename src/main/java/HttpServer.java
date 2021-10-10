@@ -33,13 +33,13 @@ public class HttpServer {
                   while(true) {
                       handleClient();
                   }
-              } catch (IOException e) {
+              } catch (IOException | SQLException e) {
                   e.printStackTrace();
               }
           }).start();
         }
 
-    private void handleClient() throws IOException {
+    private void handleClient() throws IOException, SQLException {
         clientSocket = serversocket.accept();
 
         HttpMessage httpMessage = new HttpMessage(clientSocket);
@@ -85,20 +85,11 @@ public class HttpServer {
             }
             write200Response(responseBody);
 
-                        
-          
-          
-          
-          /*if(existingProducts.size() == 0){
+          if(existingProducts.size() == 0){
 
             if(existingProducts.size() == 0){
 
                 responseBody = "The products database is currently empty. Please add products";
-                write200Response(responseBody);
-                }else {
-                for (Product product : existingProducts) {
-                    responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
-                }
                 write200Response(responseBody);
             }
         }
@@ -106,7 +97,7 @@ public class HttpServer {
             write404Response(requestTarget);
         }
     }
-
+}
     private void write404Response(String fileTarget) throws IOException {
         String notFound = "The requested file: " + fileTarget + ", was not found";
         String response =
@@ -142,9 +133,9 @@ public class HttpServer {
         HttpServer server = new HttpServer(5555);
         server.setRoot(Paths.get("./src/main/resources"));
         server.setCategories(List.of("Candy","Fruit","Pastry"));
-        Product product = new Product("Japp", "Candy");
+        /*Product product = new Product("Japp", "Candy");
         ProductDao productDao = new ProductDao();
-        productDao.addToDatabase(product);
+        productDao.addToDatabase(product);*/
     }
 
     private void setProducts(List<Product> products) {
