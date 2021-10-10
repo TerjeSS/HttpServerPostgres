@@ -14,9 +14,6 @@ import java.util.Map;
 public class HttpServer {
     private Socket clientSocket;
     private final ServerSocket serversocket;
-    String fileTarget;
-    String requestLine;
-    String contentType;
     private Path root;
     String responseBody;
     List<String> categoriesList = new ArrayList<>();
@@ -33,13 +30,13 @@ public class HttpServer {
                   while(true) {
                       handleClient();
                   }
-              } catch (IOException e) {
+              } catch (IOException | SQLException e) {
                   e.printStackTrace();
               }
           }).start();
         }
 
-    private void handleClient() throws IOException {
+    private void handleClient() throws IOException, SQLException {
         clientSocket = serversocket.accept();
 
         HttpMessage httpMessage = new HttpMessage(clientSocket);
@@ -47,7 +44,6 @@ public class HttpServer {
         String requestTarget = requestLineArray[1];
 
         Map<String, String> headerFields = httpMessage.headerFields;
-        int questionPos = requestTarget.indexOf("?");
         String messageBody = httpMessage.messageBody;
 
         if (checkForFile(requestTarget)){
@@ -76,7 +72,13 @@ public class HttpServer {
         }
         else if(requestTarget.equals("/api/products")){
             responseBody = "";
-            if(existingProducts.size() == 0){
+            ProductDao dao = new ProductDao();
+            List<Product> productList = dao.retrieveProducts();
+            for (Product product : productList) {
+                responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
+            }
+            write200Response(responseBody);
+                        /*if(existingProducts.size() == 0){
                 responseBody = "The products database is currently empty. Please add products";
                 write200Response(responseBody);
                 }else {
@@ -84,7 +86,7 @@ public class HttpServer {
                     responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
                 }
                 write200Response(responseBody);
-            }
+            }*/
         }
         else{
             write404Response(requestTarget);
@@ -126,9 +128,9 @@ public class HttpServer {
         HttpServer server = new HttpServer(5555);
         server.setRoot(Paths.get("./src/main/resources"));
         server.setCategories(List.of("Candy","Fruit","Pastry"));
-        Product product = new Product("Japp", "Candy");
-        ProductDao productDao = new ProductDao();
-        productDao.addToDatabase(product);
+//        Product product = new Product(rs.getLong(1), "Japp", "Candy");
+//        productDao.addToDatabase(product);
+       //ProductDao productDao = new ProductDao();
     }
 
     private void setProducts(List<Product> products) {
