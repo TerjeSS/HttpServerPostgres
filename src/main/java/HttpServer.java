@@ -70,6 +70,7 @@ public class HttpServer {
             }
             write200Response(responseBody);
         }
+
         else if(requestTarget.equals("/api/products")){
             responseBody = "";
             ProductDao dao = new ProductDao();
