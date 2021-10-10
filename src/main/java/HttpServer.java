@@ -135,6 +135,7 @@ public class HttpServer {
         existingProducts = products;
     }
 
+
     private void setRoot(Path path) {
         this.root = path;
     }
