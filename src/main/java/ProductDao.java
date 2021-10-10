@@ -1,8 +1,6 @@
 import org.postgresql.ds.PGSimpleDataSource;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductDao {
     PGSimpleDataSource dataSource;
@@ -29,6 +27,7 @@ public class ProductDao {
             }
             }
         }
+
     }
 
     public List<Product> retrieveProducts() throws SQLException {
@@ -45,5 +44,8 @@ public class ProductDao {
             }
         }
         return productList;
+
+
+
     }
 }
