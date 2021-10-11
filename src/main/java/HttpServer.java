@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpServer {
     private final ProductDao dao = new ProductDao();
@@ -45,31 +46,55 @@ public class HttpServer {
         Map<String, String> headerFields = httpMessage.headerFields;
         int questionPos = requestTarget.indexOf("?");
         String messageBody = httpMessage.messageBody;
+        String fileTarget;
 
-        if (checkForFile(requestTarget)){
+
+        if(questionPos != -1) {
+            fileTarget = requestTarget.substring(0, questionPos);
+        }else {
+            fileTarget = requestTarget;
+        }
+
+        if (checkForFile(fileTarget)){
             responseBody = Files.readString(root.resolve(requestTarget.substring(1)));
             write200Response(responseBody);
-            return;
         }
-        else if(requestTarget.equals("/api/newProduct")){
+         if(fileTarget.equals("/api/searchProduct")){
+             responseBody = "";
+            responseBody = "TEst test";
+            String queryParameter = requestTarget.substring(questionPos+1);
+            int equalsPos = queryParameter.indexOf("=");
+            String productName = queryParameter.substring(equalsPos+1);
+            List<Product> productList = dao.searchProduct(productName);
+            if(productList.size() != 0){
+                for (Product product : productList) {
+                    responseBody += "<li>Product: " + product.getName() + ". Category: " + product.getCategory() + "</li>";
+                }
+            }else {
+                responseBody = "No products found :(";
+            }
+            write200Response(responseBody);
+
+        }
+        else if(fileTarget.equals("/api/newProduct")){
             queryMap = new HashMap<>();
             addToDatabase(messageBody);
             write200Response(responseBody);
         }
-        else if(requestTarget.equals("/api/categoryOptions")){
+        else if(fileTarget.equals("/api/categoryOptions")){
             int value = 1;
             for (String s : categoriesList) {
                 responseBody+= "<option>" + s + "</option>";
             }
             write200Response(responseBody);
         }
-        else if(requestTarget.equals("/api/products")){
+        else if(fileTarget.equals("/api/products")){
             responseBody = "";
             listAllProducts();
             write200Response(responseBody);
         }
         else{
-            write404Response(requestTarget);
+            write404Response(fileTarget);
         }
     }
 
@@ -98,7 +123,7 @@ public class HttpServer {
     private void write404Response(String fileTarget) throws IOException {
         String notFound = "The requested file: " + fileTarget + ", was not found";
         String response =
-                "HTTP/1.1 200 OK\r\n" +
+                "HTTP/1.1 404 NOT FOUND\r\n" +
                         "Connection: Close\r\n" +
                         "Content type: text/html\r\n" +
                         "Content-Length: " + notFound.getBytes().length + "\r\n" +

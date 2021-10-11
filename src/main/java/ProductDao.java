@@ -29,7 +29,21 @@ public class ProductDao {
             }
             }
         }
-
+    }
+    public List<Product> searchProduct(String name) throws SQLException {
+        List<Product> productList = new ArrayList<>();
+        try(Connection connection = dataSource.getConnection()){
+            try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE productName = ? ") ){
+                statement.setString(1,name);
+                ResultSet rs = statement.executeQuery();
+                while(rs.next()){
+                    productList.add(new Product(
+                            rs.getLong(1),
+                            rs.getString(2),
+                            rs.getString(3)));                }
+            }
+        }
+        return productList;
     }
 
     public List<Product> retrieveProducts() throws SQLException {
