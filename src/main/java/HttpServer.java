@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,8 +80,8 @@ public class HttpServer {
         }
         else if(fileTarget.equals("/api/newProduct")){
             queryMap = new HashMap<>();
-            addToDatabase(messageBody);
-            write200Response(responseBody);
+            addToDatabase(URLDecoder.decode(messageBody, Charset.defaultCharset()));
+            write200Response(java.net.URLDecoder.decode(messageBody,"UTF-8"));
         }
         else if(fileTarget.equals("/api/categoryOptions")){
             for (String s : categoriesList) {
@@ -135,7 +137,7 @@ public class HttpServer {
         String response =
                 "HTTP/1.1 200 OK\r\n" +
                         "Connection: Close\r\n" +
-                        "Content type: text/html\r\n" +
+                        "Content type: text/html; charset=utf-8\r\n" +
                         "Content-Length: " + responseBody.getBytes().length + "\r\n" +
                         "\r\n" +
                         responseBody;

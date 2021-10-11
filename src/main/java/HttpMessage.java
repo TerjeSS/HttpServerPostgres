@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class HttpMessage {
         for (int i = 0; i < getContentLength(); i++) {
             builder.append((char) socket.getInputStream().read());
         }
-        return builder.toString();
+        return   builder.toString();
     }
 
          void readHeaders() throws IOException {
