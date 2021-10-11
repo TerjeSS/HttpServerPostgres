@@ -61,7 +61,6 @@ public class HttpServer {
         }
          if(fileTarget.equals("/api/searchProduct")){
              responseBody = "";
-            responseBody = "TEst test";
             String queryParameter = requestTarget.substring(questionPos+1);
             int equalsPos = queryParameter.indexOf("=");
             String productName = queryParameter.substring(equalsPos+1);
