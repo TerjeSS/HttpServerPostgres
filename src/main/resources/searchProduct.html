@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main>
+    <form action="/api/searchProduct">
+    <h1>Search for products</h1>
+    <label for="btn">Search for product
+        <input type="text">
+        <button id="btn" onclick="fetchFunction">Search</button>
+    </label>
+    </form>
+    <ul id="liste"></ul>
+</main>
+</body>
+<script>
+    function fetchFunction(){
+        fetch("/api/searchProduct").then(function(res){
+            return res.text()
+            }).then(function(text){
+                document.querySelector("#liste").innerHTML = text;
+            }
+        )
+    }
+</script>
+</html>
