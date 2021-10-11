@@ -39,11 +39,9 @@ public class HttpServer {
 
     private void handleClient() throws IOException, SQLException {
         clientSocket = serversocket.accept();
-
         HttpMessage httpMessage = new HttpMessage(clientSocket);
         String[] requestLineArray = httpMessage.statusLine;
         String requestTarget = requestLineArray[1];
-
         Map<String, String> headerFields = httpMessage.headerFields;
         int questionPos = requestTarget.indexOf("?");
         String messageBody = httpMessage.messageBody;
@@ -53,16 +51,9 @@ public class HttpServer {
             write200Response(responseBody);
             return;
         }
-        else if(requestTarget.contains("/api/newProduct")){
+        else if(requestTarget.equals("/api/newProduct")){
             queryMap = new HashMap<>();
-            String[] queryParameters = messageBody.split("&");
-            for (String queryParameter : queryParameters) {
-                int index = queryParameter.indexOf("=");
-                queryMap.put(queryParameter.substring(0,index), queryParameter.substring(index+1));
-            }
-            Product product = new Product(queryMap.get("productName"),queryMap.get("category"));
-            dao.addToDatabase(product);
-            responseBody = product.getName() +" added";
+            addToDatabase(messageBody);
             write200Response(responseBody);
         }
         else if(requestTarget.equals("/api/categoryOptions")){
@@ -72,23 +63,38 @@ public class HttpServer {
             }
             write200Response(responseBody);
         }
-
         else if(requestTarget.equals("/api/products")){
             responseBody = "";
-            List<Product> productList = dao.retrieveProducts();
-            if(productList.size() == 0){
-                responseBody = "The products database is currently empty. Please add products";
-                write200Response(responseBody);
-            }
-            for (Product product : productList) {
-                responseBody += "<p>Product: " + product.getName() + ". Category: " + product.getCategory();
-            }
+            listAllProducts();
             write200Response(responseBody);
         }
         else{
             write404Response(requestTarget);
         }
     }
+
+    private void listAllProducts() throws SQLException, IOException {
+        List<Product> productList = dao.retrieveProducts();
+        if(productList.size() == 0){
+            responseBody = "The products database is currently empty. Please add products";
+            write200Response(responseBody);
+        }
+        for (Product product : productList) {
+            responseBody += "<li>Product: " + product.getName() + ". Category: " + product.getCategory() + "</li>";
+        }
+    }
+
+    private void addToDatabase(String messageBody) throws SQLException {
+        String[] queryParameters = messageBody.split("&");
+        for (String queryParameter : queryParameters) {
+            int index = queryParameter.indexOf("=");
+            queryMap.put(queryParameter.substring(0,index), queryParameter.substring(index+1));
+        }
+        Product product = new Product(queryMap.get("productName"),queryMap.get("category"));
+        dao.addToDatabase(product);
+        responseBody = product.getName() +" added";
+    }
+
     private void write404Response(String fileTarget) throws IOException {
         String notFound = "The requested file: " + fileTarget + ", was not found";
         String response =
