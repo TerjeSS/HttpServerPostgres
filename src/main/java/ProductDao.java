@@ -30,7 +30,7 @@ public class ProductDao {
             }
         }
     }
-    public List<Product> searchProduct(String name) throws SQLException {
+    public List<Product> searchProductByName(String name) throws SQLException {
         List<Product> productList = new ArrayList<>();
         try(Connection connection = dataSource.getConnection()){
             try(PreparedStatement statement = connection.prepareStatement("SELECT * FROM products WHERE productName ILIKE ? ") ){

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HttpServer {
     private final ProductDao dao = new ProductDao();
@@ -26,7 +25,7 @@ public class HttpServer {
         serversocket = new ServerSocket(port);
         handleClients();
     }
-    private void handleClients() throws IOException {
+    private void handleClients() {
           new Thread(() -> {
               try {
                   while(true) {
@@ -48,15 +47,17 @@ public class HttpServer {
         String messageBody = httpMessage.messageBody;
         String fileTarget;
 
-
         if(questionPos != -1) {
             fileTarget = requestTarget.substring(0, questionPos);
         }else {
             fileTarget = requestTarget;
         }
+        if(fileTarget.equals("/")){
+            fileTarget = "/index.html";
+        }
 
         if (checkForFile(fileTarget)){
-            responseBody = Files.readString(root.resolve(requestTarget.substring(1)));
+            responseBody = Files.readString(root.resolve(fileTarget.substring(1)));
             write200Response(responseBody);
         }
          if(fileTarget.equals("/api/searchProduct")){
@@ -64,7 +65,7 @@ public class HttpServer {
             String queryParameter = requestTarget.substring(questionPos+1);
             int equalsPos = queryParameter.indexOf("=");
             String productName = queryParameter.substring(equalsPos+1);
-            List<Product> productList = dao.searchProduct(productName);
+            List<Product> productList = dao.searchProductByName(productName);
             if(productList.size() != 0){
                 for (Product product : productList) {
                     responseBody += "<li>Product: " + product.getName() + ". Category: " + product.getCategory() + "</li>";
@@ -81,7 +82,6 @@ public class HttpServer {
             write200Response(responseBody);
         }
         else if(fileTarget.equals("/api/categoryOptions")){
-            int value = 1;
             for (String s : categoriesList) {
                 responseBody+= "<option>" + s + "</option>";
             }
@@ -150,13 +150,10 @@ public class HttpServer {
         }
     }
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException {
         HttpServer server = new HttpServer(5555);
         server.setRoot(Paths.get("./src/main/resources"));
         server.setCategories(List.of("Candy","Fruit","Pastry"));
-        /*Product product = new Product("Japp", "Candy");
-        ProductDao productDao = new ProductDao();
-        productDao.addToDatabase(product);*/
     }
     //Only for testing
     private void setProducts(List<Product> products) {
